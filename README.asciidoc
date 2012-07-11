@@ -1,0 +1,50 @@
+wordgolem README
+================
+
+A script for generating random gibberish from a minecraft server.log
+or the KJV Bible.
+
+Requirements
+------------
+
+You need these to run this program:
+
+* coreutils
+* bash
+* dadadodo
+
+You will need a version of coreutils that contains shuf. If your system doesn't
+have shuf, you can grab the `random` script from my buceutils project and
+replace occurences of `shuf -e -n 1` with `random echo`.
+
+For KJV functionality, you will need:
+
+* curl
+* dos2unix
+* unzip
+
+wordgolem can also send the generated sentences to screen or tmux if you have
+one of them installed.
+
+Overview
+--------
+Install wordgolem in your PATH, modify the variables near the top so that
+they're sane, and set it executable.
+
+To generate the data that wordgolem relies on:
+
+	wordgolem init # generate data from chat messages in server.log
+	wordgolem kjv  # generate data from KJV Bible
+
+If you execute both commands, wordgolem will randomly select which data to use
+each time it is run.
+
+To generate gibberish based on the data sources you set up:
+
+	wordgolem        # print data source to stderr and nonsense to stdout
+	wordgolem screen # send nonsense to screen
+	wordgolem tmux   # send nonsense to tmux
+
+/////
+vim: set syntax=asciidoc ts=4 sw=4 noet:
+/////
