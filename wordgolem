@@ -1,0 +1,90 @@
+#!/bin/bash -e
+
+#SERVER_DIR="$HOME/minecraft"
+SERVER_DIR="."
+CACHE_DIR="$SERVER_DIR/cache"
+LOGFILE="$SERVER_DIR/server.log"
+
+KJVURL='http://printkjv.ifbweb.com/AV_txts.zip' 
+KJVFILE="$CACHE_DIR/$(basename "$KJVURL")"
+
+RE_PREFIX='[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} \[INFO\]'
+RE_IGN='<([a-zA-Z]*)>'
+
+init() {
+	mkdir -p "$CACHE_DIR"
+	rm -f "$CACHE_DIR/"*.chat.log
+
+	# split data up into files, 1 per player
+	sed -nre "/^$RE_PREFIX $RE_IGN/ {
+		s/^$RE_PREFIX $RE_IGN (.)/\1 \U\2/
+		s/[^!?.]$/&./
+		p
+	}" "$@" | \
+	while read player msg; do
+		echo "$msg" >>"$CACHE_DIR/$player.chat.log"
+	done
+
+	# compile the markov chains
+	for file in "$CACHE_DIR/"*.chat.log; do
+		if [ "$(wc -l "$file" | cut -d' ' -f1)" -lt 10 ]; then
+			rm "$file"
+		else
+			dadadodo -o "${file%.log}.dat" "$file"
+		fi
+	done
+}
+
+kjv() {
+	mkdir -p "$CACHE_DIR"
+
+	# download, extract
+	curl -#L -o "$KJVFILE" "$KJVURL"
+	unzip "$KJVFILE"
+
+	# massage the data
+	rm AV1611text/Preface*.txt
+	for file in AV1611text/*.txt; do
+		mv "$file" "$CACHE_DIR/$(basename ${file%.txt}.kjv.txt)"
+	done
+	dos2unix --d2u "$CACHE_DIR/"*.kjv.txt
+	sed -r -i "
+		s/^[0-9]* //
+		/^[^a-z]*$/d
+		s/[][]//g
+	" "$CACHE_DIR/"*.kjv.txt
+
+	# compile the markov chains
+	for file in "$CACHE_DIR/"*.kjv.txt; do
+		if [ "$(wc -l "$file" | cut -d' ' -f1)" -lt 10 ]; then
+			rm "$file"
+		else
+			dadadodo -o "${file%.txt}.dat" "$file"
+		fi
+	done
+}
+
+jumble() {
+	file="$(shuf -e -n 1 "$@")"
+	echo -n "$(basename ${file%.*.dat}): " >&2
+	echo $(dadadodo -l "$file" -c 1)
+}
+
+send-screen() {
+	screen -S minecraft -p 0 -X stuff "$*
+"
+}
+
+send-tmux() {
+	tmux send -t minecraft "$*" C-m
+}
+
+case "$1" in
+  init)   init "$LOGFILE" ;;
+  kjv)    kjv ;;
+  "")     jumble "$CACHE_DIR/"*.dat ;;
+  screen) send-screen "say $(jumble "$CACHE_DIR/"*.dat 2>/dev/null)" ;;
+  tmux)   send-tmux   "say $(jumble "$CACHE_DIR/"*.dat 2>/dev/null)" ;;
+  *)      echo "Usage: $(basename $0) [init|screen|tmux]" ;;
+esac
+
