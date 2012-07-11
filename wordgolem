@@ -9,7 +9,7 @@ KJVURL='http://printkjv.ifbweb.com/AV_txts.zip'
 KJVFILE="$CACHE_DIR/$(basename "$KJVURL")"
 
 RE_PREFIX='[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} \[INFO\]'
-RE_IGN='<([a-zA-Z]*)>'
+RE_IGN='<([0-9a-zA-Z_]*)>'
 
 init() {
 	mkdir -p "$CACHE_DIR"
