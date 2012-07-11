@@ -34,6 +34,7 @@ they're sane, and set it executable.
 To generate the data that wordgolem relies on:
 
 	wordgolem init # generate data from chat messages in server.log
+
 	wordgolem kjv  # generate data from KJV Bible
 
 If you execute both commands, wordgolem will randomly select which data to use
@@ -42,7 +43,9 @@ each time it is run.
 To generate gibberish based on the data sources you set up:
 
 	wordgolem        # print data source to stderr and nonsense to stdout
+
 	wordgolem screen # send nonsense to screen
+
 	wordgolem tmux   # send nonsense to tmux
 
 /////
