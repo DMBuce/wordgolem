@@ -13,9 +13,9 @@ You need these to run this program:
 * bash
 * dadadodo
 
-You will need a version of coreutils that contains shuf. If your system doesn't
-have shuf, you can grab the `random` script from my buceutils project and
-replace occurences of `shuf -e -n 1` with `random echo`.
+You will need a version of coreutils that contains `shuf`. If your system
+doesn't have `shuf`, you can grab the `random` script from my buceutils project
+and replace occurences of `shuf -e -n 1` with `random echo`.
 
 For KJV functionality, you will need:
 
@@ -28,7 +28,7 @@ one of them installed.
 
 Overview
 --------
-Install wordgolem in your PATH, modify the variables near the top so that
+Install wordgolem in your +PATH+, modify the variables near the top so that
 they're sane, and set it executable.
 
 To generate the data that wordgolem relies on:
